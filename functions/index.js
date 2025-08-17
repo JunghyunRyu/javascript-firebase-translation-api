@@ -1,17 +1,26 @@
-const {onRequest} = require("firebase-functions/https");
+const {onRequest} = require("firebase-functions/v2/https");
+const {defineSecret} = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
 const OpenAI = require("openai");
+const rateLimit = require("express-rate-limit");
 
-// OpenAI 클라이언트 초기화 - 환경변수에서 API 키 가져오기
-const openaiApiKey = process.env.OPENAI_API_KEY;
+// OpenAI API 키 시크릿 정의
+const openaiApiKey = defineSecret("OPENAI_API_KEY");
 
-if (!openaiApiKey) {
-    logger.error("OPENAI_API_KEY 환경변수가 설정되지 않았습니다.");
-    throw new Error("OPENAI_API_KEY 환경변수가 필요합니다.");
-}
-
+// OpenAI 클라이언트 초기화
 const openai = new OpenAI({
-    apiKey: openaiApiKey
+    apiKey: openaiApiKey.value()
+});
+
+// Rate Limiting 설정
+const translationLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1분
+    max: 10, // IP당 최대 10회 요청
+    message: {
+        error: "요청이 너무 많습니다. 1분 후에 다시 시도해주세요."
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 
 // 보안 헤더 설정 함수
@@ -25,18 +34,40 @@ const setSecurityHeaders = (response) => {
     });
 };
 
-exports.helloWorld = onRequest((request, response) => {
+exports.helloWorld = onRequest({
+    region: 'asia-northeast3',
+    memory: '256MiB',
+    timeoutSeconds: 30,
+    maxInstances: 10,
+    secrets: []
+}, (request, response) => {
     setSecurityHeaders(response);
     response.send("Hello World!");
 });
 
-exports.christmas = onRequest((request, response) => {
+exports.christmas = onRequest({
+    region: 'asia-northeast3',
+    memory: '256MiB',
+    timeoutSeconds: 30,
+    maxInstances: 10,
+    secrets: []
+}, (request, response) => {
     setSecurityHeaders(response);
     response.send({"message": "Merry Christmas!"});
 });
 
-exports.translate = onRequest(async (request, response) => {
+exports.translate = onRequest({
+    region: 'asia-northeast3',
+    memory: '512MiB',
+    timeoutSeconds: 60,
+    maxInstances: 20,
+    concurrency: 80,
+    secrets: [openaiApiKey]
+}, async (request, response) => {
     setSecurityHeaders(response);
+    
+    // Rate Limiting 적용
+    translationLimiter(request, response, () => {});
     
     try {
         const message = request.query.message;
@@ -89,7 +120,14 @@ exports.translate = onRequest(async (request, response) => {
         });
 
     } catch (error) {
-        logger.error("번역 중 오류 발생:", error);
+        // 구조적 로깅
+        logger.error("번역 API 오류", {
+            error: error.message,
+            stack: error.stack,
+            statusCode: 500,
+            endpoint: '/translate',
+            timestamp: new Date().toISOString()
+        });
         
         // 민감한 정보가 포함된 에러 메시지 필터링
         const errorMessage = error.message.includes('API key') || error.message.includes('authentication') 

@@ -1,12 +1,35 @@
 # 🌟 AI 번역 서비스 (Firebase Cloud Functions)
 
-OpenAI GPT-4를 활용한 실시간 번역 서비스입니다. Firebase Cloud Functions를 기반으로 구축되어 안정적이고 확장 가능한 번역 API를 제공합니다.
+OpenAI GPT-4o-mini를 활용한 실시간 번역 서비스입니다. Firebase Cloud Functions 2nd gen을 기반으로 구축되어 안정적이고 확장 가능한 번역 API를 제공합니다.
+
+## 🏗️ 아키텍처
+
+```mermaid
+graph LR
+    A[클라이언트] --> B[Firebase Functions<br/>asia-northeast3]
+    B --> C[Secret Manager<br/>API 키 관리]
+    B --> D[OpenAI API<br/>GPT-4o-mini]
+    D --> B
+    B --> A
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#e8f5e8
+    style D fill:#fff3e0
+```
+
+**보안 특징:**
+- 🔐 Secret Manager를 통한 안전한 API 키 관리
+- 🛡️ Rate Limiting (분당 10회 요청 제한)
+- 🔒 보안 헤더 (XSS, CSRF 방지)
+- ✅ 입력 검증 (500자 제한, HTML 태그 제거)
 
 ## 🚀 주요 기능
 
-- **실시간 번역**: OpenAI GPT-4를 활용한 고품질 번역
-- **보안 강화**: 입력 검증 및 보안 헤더 적용
-- **확장 가능**: Firebase Cloud Functions 기반 서버리스 아키텍처
+- **실시간 번역**: OpenAI GPT-4o-mini를 활용한 고품질 번역
+- **보안 강화**: 입력 검증, 보안 헤더, Rate Limiting 적용
+- **확장 가능**: Firebase Cloud Functions 2nd gen 기반 서버리스 아키텍처
+- **현대적 보안**: Secret Manager를 통한 안전한 API 키 관리
 - **다국어 지원**: 한국어 번역 특화 (추후 다국어 확장 예정)
 
 ## 📋 요구사항
@@ -21,8 +44,8 @@ OpenAI GPT-4를 활용한 실시간 번역 서비스입니다. Firebase Cloud Fu
 ### 1. 저장소 클론
 
 ```bash
-git clone https://github.com/your-username/ai-translation-service.git
-cd ai-translation-service
+git clone https://github.com/JunghyunRyu/javascript-firebase-translation-api.git
+cd javascript-firebase-translation-api
 ```
 
 ### 2. 의존성 설치
@@ -64,7 +87,7 @@ npm run serve
 
 ### 번역 API
 
-**엔드포인트**: `POST /translate`
+**엔드포인트**: `GET /translate`
 
 **파라미터**:
 - `message` (string, 필수): 번역할 텍스트 (최대 500자)
@@ -81,7 +104,7 @@ npm run serve
 **사용 예시**:
 
 ```bash
-curl "https://your-project.cloudfunctions.net/translate?message=Hello%20world"
+curl "https://asia-northeast3-your-project.cloudfunctions.net/translate?message=Hello%20world"
 ```
 
 ### 테스트 API
@@ -113,11 +136,12 @@ curl "https://your-project.cloudfunctions.net/translate?message=Hello%20world"
 npm run deploy
 ```
 
-### 환경변수 설정 (Firebase Console)
+### Secret Manager 설정 (Firebase Console)
 
 1. Firebase Console → Functions → 설정
-2. 환경변수 섹션에서 `OPENAI_API_KEY` 추가
+2. Secret Manager 섹션에서 `OPENAI_API_KEY` 시크릿 생성
 3. 실제 OpenAI API 키 값 입력
+4. 함수에서 시크릿 참조 설정
 
 ## 🧪 테스트
 
@@ -176,7 +200,7 @@ npm run logs
 
 ## 📞 지원
 
-- **이슈 리포트**: [GitHub Issues](https://github.com/your-username/ai-translation-service/issues)
+- **이슈 리포트**: [GitHub Issues](https://github.com/JunghyunRyu/javascript-firebase-translation-api/issues)
 - **보안 문제**: [SECURITY.md](./SECURITY.md) 참조
 - **문서**: [Wiki](../../wiki) 페이지 참조
 
