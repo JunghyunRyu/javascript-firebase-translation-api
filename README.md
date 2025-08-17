@@ -85,6 +85,10 @@ npm run serve
 
 ## 📚 API 사용법
 
+### 📖 API 문서
+- **OpenAPI 스펙**: [docs/openapi.yaml](./docs/openapi.yaml)
+- **Postman 컬렉션**: [docs/postman-collection.json](./docs/postman-collection.json)
+
 ### 번역 API
 
 **엔드포인트**: `GET /translate`
@@ -157,19 +161,48 @@ npm run shell
 npm test
 ```
 
+### 테스트 커버리지
+
+```bash
+npm run test:coverage
+```
+
+### 코드 품질 검사
+
+```bash
+npm run lint
+npm run lint:fix
+```
+
 ## 📁 프로젝트 구조
 
 ```
 ├── functions/
-│   ├── index.js          # Cloud Functions 메인 코드
-│   ├── package.json      # Node.js 의존성
-│   ├── env.example       # 환경변수 예시
-│   └── node_modules/     # 의존성 패키지
-├── firebase.json         # Firebase 설정
-├── .firebaserc.example   # Firebase 프로젝트 설정 예시
-├── .gitignore           # Git 제외 파일
-├── SECURITY.md          # 보안 가이드
-└── README.md            # 프로젝트 문서
+│   ├── index.js              # Cloud Functions 메인 코드
+│   ├── package.json          # Node.js 의존성
+│   ├── env.example           # 환경변수 예시
+│   ├── jest.config.js        # Jest 테스트 설정
+│   ├── .eslintrc.js          # ESLint 설정
+│   ├── __tests__/            # 테스트 파일들
+│   │   └── translate.test.js # 번역 API 테스트
+│   └── node_modules/         # 의존성 패키지
+├── docs/
+│   ├── openapi.yaml          # OpenAPI 스펙
+│   ├── postman-collection.json # Postman 컬렉션
+│   ├── api-reference.md      # API 참조 문서
+│   ├── deployment-guide.md   # 배포 가이드
+│   ├── troubleshooting.md    # 문제 해결 가이드
+│   ├── faq.md               # 자주 묻는 질문
+│   └── examples/            # 사용 예시
+│       └── javascript.md    # JavaScript 예시
+├── .github/
+│   └── workflows/
+│       └── ci.yml           # GitHub Actions CI/CD
+├── firebase.json            # Firebase 설정
+├── .firebaserc.example      # Firebase 프로젝트 설정 예시
+├── .gitignore              # Git 제외 파일
+├── SECURITY.md             # 보안 가이드
+└── README.md               # 프로젝트 문서
 ```
 
 ## 🤝 기여하기

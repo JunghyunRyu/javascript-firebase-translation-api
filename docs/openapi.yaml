@@ -1,0 +1,139 @@
+openapi: 3.0.3
+info:
+  title: AI Translation Service API
+  description: OpenAI GPT-4o-mini를 활용한 실시간 번역 서비스 API
+  version: 1.0.0
+  contact:
+    name: API Support
+    url: https://github.com/JunghyunRyu/javascript-firebase-translation-api/issues
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://asia-northeast3-{project-id}.cloudfunctions.net
+    description: Production server
+    variables:
+      project-id:
+        description: Firebase 프로젝트 ID
+        default: your-project-id
+
+paths:
+  /translate:
+    get:
+      summary: 텍스트 번역
+      description: 영어 텍스트를 한국어로 번역합니다.
+      operationId: translateText
+      parameters:
+        - name: message
+          in: query
+          required: true
+          description: 번역할 텍스트 (최대 500자)
+          schema:
+            type: string
+            maxLength: 500
+            example: "Hello, world!"
+      responses:
+        '200':
+          description: 성공적인 번역
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  original_message:
+                    type: string
+                    description: 원본 메시지
+                    example: "Hello, world!"
+                  korean_translated_message:
+                    type: string
+                    description: 한국어 번역 결과
+                    example: "안녕하세요, 세계!"
+                required:
+                  - original_message
+                  - korean_translated_message
+        '400':
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: 요청 한도 초과
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security: []
+      tags:
+        - Translation
+
+  /helloWorld:
+    get:
+      summary: 테스트 엔드포인트
+      description: 기본 테스트용 엔드포인트입니다.
+      operationId: helloWorld
+      responses:
+        '200':
+          description: 성공
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Hello World!"
+      security: []
+      tags:
+        - Test
+
+  /christmas:
+    get:
+      summary: 크리스마스 메시지
+      description: 크리스마스 메시지를 반환합니다.
+      operationId: christmas
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Merry Christmas!"
+                required:
+                  - message
+      security: []
+      tags:
+        - Test
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: 오류 메시지
+          example: "메시지가 필요합니다. 'message' 쿼리 파라미터를 제공해주세요."
+      required:
+        - error
+
+  securitySchemes: {}
+
+tags:
+  - name: Translation
+    description: 번역 관련 API
+  - name: Test
+    description: 테스트용 API
+
+externalDocs:
+  description: 프로젝트 문서
+  url: https://github.com/JunghyunRyu/javascript-firebase-translation-api
+

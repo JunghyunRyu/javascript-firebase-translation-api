@@ -1,0 +1,165 @@
+{
+  "info": {
+    "name": "AI Translation Service API",
+    "description": "OpenAI GPT-4o-mini를 활용한 실시간 번역 서비스 API 컬렉션",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Translation",
+      "item": [
+        {
+          "name": "Translate Text",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://asia-northeast3-{{project_id}}.cloudfunctions.net/translate?message={{message}}",
+              "host": [
+                "asia-northeast3-{{project_id}}",
+                "cloudfunctions",
+                "net"
+              ],
+              "path": [
+                "translate"
+              ],
+              "query": [
+                {
+                  "key": "message",
+                  "value": "{{message}}",
+                  "description": "번역할 텍스트"
+                }
+              ]
+            },
+            "description": "영어 텍스트를 한국어로 번역합니다."
+          },
+          "response": []
+        },
+        {
+          "name": "Translate Text - Error (No Message)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://asia-northeast3-{{project_id}}.cloudfunctions.net/translate",
+              "host": [
+                "asia-northeast3-{{project_id}}",
+                "cloudfunctions",
+                "net"
+              ],
+              "path": [
+                "translate"
+              ]
+            },
+            "description": "메시지 파라미터 없이 요청하여 오류 응답을 확인합니다."
+          },
+          "response": []
+        }
+      ],
+      "description": "번역 관련 API"
+    },
+    {
+      "name": "Test",
+      "item": [
+        {
+          "name": "Hello World",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://asia-northeast3-{{project_id}}.cloudfunctions.net/helloWorld",
+              "host": [
+                "asia-northeast3-{{project_id}}",
+                "cloudfunctions",
+                "net"
+              ],
+              "path": [
+                "helloWorld"
+              ]
+            },
+            "description": "기본 테스트 엔드포인트"
+          },
+          "response": []
+        },
+        {
+          "name": "Christmas Message",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "https://asia-northeast3-{{project_id}}.cloudfunctions.net/christmas",
+              "host": [
+                "asia-northeast3-{{project_id}}",
+                "cloudfunctions",
+                "net"
+              ],
+              "path": [
+                "christmas"
+              ]
+            },
+            "description": "크리스마스 메시지를 반환합니다."
+          },
+          "response": []
+        }
+      ],
+      "description": "테스트용 API"
+    }
+  ],
+  "variable": [
+    {
+      "key": "project_id",
+      "value": "your-project-id",
+      "description": "Firebase 프로젝트 ID"
+    },
+    {
+      "key": "message",
+      "value": "Hello, world!",
+      "description": "번역할 텍스트"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// 요청 전 실행되는 스크립트",
+          "console.log('Request URL:', pm.request.url);"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// 응답 후 실행되는 테스트 스크립트",
+          "pm.test('Status code is 200', function () {",
+          "    pm.response.to.have.status(200);",
+          "});",
+          "",
+          "pm.test('Response time is less than 5000ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});"
+        ]
+      }
+    }
+  ]
+}
+
