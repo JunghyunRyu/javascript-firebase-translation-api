@@ -22,7 +22,7 @@ paths:
   /translate:
     get:
       summary: 텍스트 번역
-      description: 영어 텍스트를 한국어로 번역합니다.
+      description: 다국어 텍스트 번역을 지원합니다.
       operationId: translateText
       parameters:
         - name: message
@@ -33,6 +33,24 @@ paths:
             type: string
             maxLength: 500
             example: "Hello, world!"
+        - name: target
+          in: query
+          required: false
+          description: 대상 언어 코드 (기본값: ko)
+          schema:
+            type: string
+            enum: [ko, en, ja, zh, es, fr, de, ru, pt, it]
+            default: ko
+            example: "ko"
+        - name: source
+          in: query
+          required: false
+          description: 원본 언어 코드 (기본값: auto)
+          schema:
+            type: string
+            enum: [auto, ko, en, ja, zh, es, fr, de, ru, pt, it]
+            default: auto
+            example: "auto"
       responses:
         '200':
           description: 성공적인 번역
@@ -40,18 +58,36 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  original_message:
-                    type: string
-                    description: 원본 메시지
-                    example: "Hello, world!"
-                  korean_translated_message:
-                    type: string
-                    description: 한국어 번역 결과
-                    example: "안녕하세요, 세계!"
-                required:
-                  - original_message
-                  - korean_translated_message
+                                 properties:
+                   original_message:
+                     type: string
+                     description: 원본 메시지
+                     example: "Hello, world!"
+                   source_language:
+                     type: string
+                     description: 원본 언어 코드
+                     example: "auto"
+                   target_language:
+                     type: string
+                     description: 대상 언어 코드
+                     example: "ko"
+                   translated_message:
+                     type: string
+                     description: 번역 결과
+                     example: "안녕하세요, 세계!"
+                   supported_languages:
+                     type: object
+                     description: 지원 언어 목록
+                     example:
+                       ko: "한국어"
+                       en: "영어"
+                       ja: "일본어"
+                 required:
+                   - original_message
+                   - source_language
+                   - target_language
+                   - translated_message
+                   - supported_languages
         '400':
           description: 잘못된 요청
           content:
@@ -91,7 +127,7 @@ paths:
       tags:
         - Test
 
-  /christmas:
+    /christmas:
     get:
       summary: 크리스마스 메시지
       description: 크리스마스 메시지를 반환합니다.
@@ -113,7 +149,70 @@ paths:
       tags:
         - Test
 
-components:
+  /detectLanguage:
+    get:
+      summary: 언어 감지
+      description: 텍스트의 언어를 자동으로 감지합니다.
+      operationId: detectLanguage
+      parameters:
+        - name: message
+          in: query
+          required: true
+          description: 언어를 감지할 텍스트 (최대 1000자)
+          schema:
+            type: string
+            maxLength: 1000
+            example: "Hello, world!"
+      responses:
+        '200':
+          description: 성공적인 언어 감지
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  original_message:
+                    type: string
+                    description: 원본 메시지
+                    example: "Hello, world!"
+                  detected_language_code:
+                    type: string
+                    description: 감지된 언어 코드
+                    example: "en"
+                  detected_language_name:
+                    type: string
+                    description: 감지된 언어 이름
+                    example: "영어"
+                  confidence:
+                    type: string
+                    description: 감지 신뢰도
+                    example: "high"
+                  supported_languages:
+                    type: object
+                    description: 지원 언어 목록
+                required:
+                  - original_message
+                  - detected_language_code
+                  - detected_language_name
+                  - confidence
+                  - supported_languages
+        '400':
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security: []
+      tags:
+        - Translation
+
+  components:
   schemas:
     Error:
       type: object
